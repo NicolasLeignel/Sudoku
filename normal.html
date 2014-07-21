@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <link rel="stylesheet" href="css/themes/Sudoku.min.css" />
+        <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.css" />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js"></script>
+        <script src="js/sudoku.js" type="text/javascript"></script>
+        <title>Sudoku</title>
+    </head>
+
+    <body>
+
+        <div data-role="page" data-theme="a">
+
+            <div data-role="panel" id="defaultpanel" data-theme="a" data-display="overlay" data-position-fixed="true">
+                <input type="button" class="control-button" onClick="save()" value="Sauver partie" />
+                <input type="button" class="control-button" onClick="load()" value="Charger partie" />
+                <input type="button" class="control-button" onClick="reloadGame()" value="Recommencer" />
+                <div class="option-item">
+                    <label for="style-selector">Style</label>
+                    <select name="style-selector" id="style-selector" onchange="selectStyleSheet()">
+                        <option value="paper-style" selected="selected">Paper</option>
+                        <option value="classic-style">Classic</option>
+                        <option value="rainbow-style">Rainbow</option>
+                    </select>
+                </div>
+
+                <form class="option-item">
+                    <label for="live-hints" style="float:left; font-weight:bold; line-height:32px; margin:9px 10px 0px 0px;">Indice</label>
+                    <input type="checkbox" data-role="flipswitch" name="live-hints" id="live-hints" value="Live" />
+                </form>
+
+                <input type="button" class="control-button" onclick="checkStatus()" value="How am I Doing?" />
+
+                <div id="pen-tool">
+                    <a href="javascript:pickPen();">Pick Pen</a>
+                    <div id="pen-picks" style="display:none;">
+                        <span id="selected-pen-number">1</span>
+                        <a href="javascript:downPen();">Drop Pen</a><br />
+                        <input type="button" value="1" onclick="pickPenDigit(1)" /> 
+                        <input type="button" value="2" onclick="pickPenDigit(2)" /> 
+                        <input type="button" value="3" onclick="pickPenDigit(3)" /><br />
+                        <input type="button" value="4" onclick="pickPenDigit(4)" /> 
+                        <input type="button" value="5" onclick="pickPenDigit(5)" /> 
+                        <input type="button" value="6" onclick="pickPenDigit(6)" /><br />
+                        <input type="button" value="7" onclick="pickPenDigit(7)" />
+                        <input type="button" value="8" onclick="pickPenDigit(8)" />
+                        <input type="button" value="9" onclick="pickPenDigit(9)" />
+                    </div>
+                </div>
+                <div id="cheats">
+                    <input type="button" class="control-button" value="Reveal Cell" onclick="revealCell()" />
+                </div>
+            </div><!-- /panel -->
+
+            <div data-role="popup" id="popupMenu" data-theme="a" data-overlay-theme="b" style="border-radius:10px;">
+                <center id="control-area">                 
+
+                    <div class="option-item">
+                    <label for="difficulty">Difficulty</label>
+                    <select name="difficulty" id="difficulty" overlay="push">
+                        <option value="3">Difficile</option>
+                        <option value="4" selected="selected">Normal</option>
+                        <option value="5">Facile</option>
+                    </select>
+                </div>
+
+                    <div class="ui-input-btn ui-btn ui-corner-all" style="border-top-left-radius:0px; border-top-right-radius:0px; border-bottom-left-radius:10px; border-bottom-right-radius:10px; background-color:#ec7e82; text-shadow:none; color:#FFF; border:none; height:60px; line-height: 60px;">Nouveau<input type="button" data-enhanced="true" data-shadow="false" class="control-button" onClick="newGame()" value="Nouveau">
+                    </div>
+                </center>
+            </div><!-- /popup -->
+
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" style="border:none; border-bottom-right-radius:20px 20px; border-bottom-left-radius:20px 20px">
+                <a href="#defaultpanel" class="ui-btn ui-alt-icon ui-nodisc-icon ui-corner-all ui-icon-carat-l ui-btn-icon-notext ui-b#tn-inline ui-btn-hover-a ui-btn-down-b">Default panel</a>
+                <h1>SUDOKU</h1>
+                <a href="#popupMenu" data-rel="popup" data-transition="slideup" data-position-to="window" class="ui-btn ui-alt-icon ui-nodisc-icon ui-corner-all ui-icon-gear ui-btn-icon-notext ui-btn-inline ui-btn-hover-a ui-btn-down-b">Gear</a>
+            </div><!-- /header -->
+
+            <div data-role="content" style="text-align:center; padding:0px;">
+
+                
+
+                <span id="timer">00:00</span>
+                
+                <div class="square-box">
+                    <div class="square-content">
+                        <div id="pause-hider"></div><!-- /pause -->
+                        <form name="f" id="grid">
+                            <table class="root-table">
+                            <tr>
+                                <td>
+                                    <table class="box box-one">
+                                        <tr>
+                                            <td><input id="c11" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c12" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c13" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c14" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c15" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c16" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c17" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c18" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c19" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-two">
+                                        <tr>
+                                            <td><input id="c21" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c22" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c23" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c24" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c25" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c26" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c27" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c28" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c29" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-three">
+                                        <tr>
+                                            <td><input id="c31" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c32" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c33" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c34" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c35" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c36" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c37" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c38" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c39" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table class="box box-four">
+                                        <tr>
+                                            <td><input id="c41" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c42" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c43" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c44" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c45" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c46" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c47" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c48" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c49" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-five">
+                                        <tr>
+                                            <td><input id="c51" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c52" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c53" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c54" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c55" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c56" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c57" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c58" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c59" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-six">
+                                        <tr>
+                                            <td><input id="c61" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c62" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c63" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c64" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c65" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c66" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c67" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c68" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c69" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table class="box box-seven">
+                                        <tr>
+                                            <td><input id="c71" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c72" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c73" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c74" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c75" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c76" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c77" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c78" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c79" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-eight">
+                                        <tr>
+                                            <td><input id="c81" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c82" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c83" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c84" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c85" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c86" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c87" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c88" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c89" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <table class="box box-nine">
+                                        <tr>
+                                            <td><input id="c91" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c92" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c93" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c94" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c95" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c96" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input id="c97" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c98" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                            <td><input id="c99" type="number" data-clear-btn="false" min="1" max="9" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="display_area"></div>
+
+            </div><!-- /content -->
+
+            <div data-role="footer" data-position="fixed" role="contentinfo" data-transition="slide" data-theme="a" class="ui-footer ui-bar-a ui-footer-fixed slide" style="border:none; background-color:#F9F9F9;">
+                <div class="ui-grid-solo" style="margin:6px 20px;">
+                    <input type="button" data-enhanced="true" data-shadow="false" data-theme="a" id="timer_control" onclick="toggleTimer()" value="Pause" style="width:100%; height:100%; background-color:#2AACAA; text-shadow:none; color:#FFF; border:none; border-radius:.3125em; font-size:12.5px; font-weight:bold; line-height:34px; padding:0px; cursor:pointer;">
+                </div>
+                <div class="ui-grid-a" style="margin-bottom:14px;">
+                    <div class="ui-block-a">
+                        <div class="ui-input-btn ui-btn ui-corner-all" style="border-radius:.3125em; display:block; margin:6px 6px 6px 20px; background-color:#2AACAA; text-shadow:none; color:#FFF; border:none;">Valider<input type="button" data-enhanced="true" data-shadow="false" data-theme="a" onClick="checker()" value="Valider">
+                        </div>
+                    </div>
+                    <div class="ui-block-b">
+                        <div class="ui-input-btn ui-btn ui-corner-all" style="border-radius:.3125em; display:block; margin:6px 20px 6px 6px; background-color:#ec7e82; text-shadow:none; color:#FFF; border:none;">Abandonner<input type="button" data-enhanced="true" data-shadow="false" data-theme="a" onClick="solve()" value="Abandonner">
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /footer -->
+
+        </div><!-- /page -->
+
+    </body>
+</html>
