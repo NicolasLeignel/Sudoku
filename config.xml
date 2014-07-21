@@ -7,7 +7,7 @@
     <author email="nicolas.leignel@gmail.com" href="http://cordova.io">
         Nicolas
     </author>
-    <content src="home.html" />
+    <content src="index.html" />
     <access origin="*" />
     <preference name="Fullscreen" value="true" />
     <preference name="Orientation" value="default" />
