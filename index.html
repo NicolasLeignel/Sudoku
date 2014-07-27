@@ -27,14 +27,6 @@
 
     <div data-role="panel" id="defaultpanel" data-theme="a" data-display="overlay" data-position-fixed="true">
 
-      <form style="text-align:center;">
-        <input type="checkbox" data-role="flipswitch" data-mini="true" id="displayTimer" checked="">
-        <label for="displayTimer" style="font-weight:bold;">Timer</label>
-      </form>
-      <div id="timer-1" class="timer-wrapper">
-        <span class="time-passed">0:00</span>
-      </div>
-
       <form>
         <input type="button" class="ui-btn ui-corner-all" data-enhanced="true" data-shadow="false" onclick="toggleTimer()" id="timer-stop" value="Pause" style="color:#38c; border:3px solid #38c;">
       </form>
@@ -77,6 +69,10 @@
         </form>
       </div>
 
+      <form style="text-align:center;">
+        <input type="checkbox" data-role="flipswitch" data-mini="true" id="displayTimer" checked="">
+        <label for="displayTimer" style="font-weight:bold;">Timer</label>
+      </form>
     </div><!-- /panel -->
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false" style="border:none; border-bottom-right-radius:20px 20px; border-bottom-left-radius:20px 20px">
@@ -87,6 +83,7 @@
 
     <div data-role="content">
 
+      <div style="display:table-cell; vertical-align:middle;">
       <div class="square-box">
         <div class="square-content">
           <div id="pause-hider"></div><!-- /pause -->
@@ -195,13 +192,18 @@
           </table>
         </div>
       </div>
+      </div>
 
-    </div>
+    </div><!-- /content -->
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" style="border:none; border-top-right-radius:20px 20px; border-top-left-radius:20px 20px">
+      <h1><div id="timer-1" class="timer-wrapper"><span class="time-passed">0:00</span></div></h1>
+    </div><!-- /footer -->
 
     <script type="text/javascript">
       $(document).ready(function(){
       // fade in content.
-        $("#homePage").fadeIn(10000);   
+        $("#homePage").fadeIn(10000);
       });
     </script>
     <script>
