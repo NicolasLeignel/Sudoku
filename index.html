@@ -8,162 +8,88 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.css" />
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js"></script>
-    <title>Sudoku</title>
+    <title>SUDOKU</title>
   </head>
 
   <body>
-  <div data-role="page" data-theme="a">
+
+  <!-- Start of first page -->
+  <div data-role="page" id="homePage" data-theme="a">
+    <div data-role="content">
+      <div style="text-align:center; margin-top:220px;">
+        <a href="#playPage" class="ui-btn ui-corner-all ui-btn-inline" style="width:150px; text-shadow: none; color:#38c; border:3px solid #38c;">Jouer</a>
+      </div>
+    </div><!-- /content -->
+  </div><!-- /page -->
+
+  <!-- Start of second page -->
+  <div data-role="page" id="playPage" data-theme="a">
 
     <div data-role="panel" id="defaultpanel" data-theme="a" data-display="overlay" data-position-fixed="true">
-      <section id="game-details" class="group">
-        <div class="difficulty-display">
-          <p>Difficulty:</p>
-          <p><span class="difficulty">Easy</span></p>
-        </div>
 
-        <div id="timer-1" class="timer-wrapper">
-          <div class="timer">
-            <div class="timer-display">
-              <p>Timer:</p>
-              <p><span class="time-passed">0:00</span></p>
-            </div>
-            <div class="close-timer">
-            </div>
-            <input type="checkbox" class="toggle" id="timer-start" value="start">
-            <label for="timer-start"></label>
-          </div>
-          <div class="show-timer">
-            Show Timer
-          </div>
-        </div>
-      </section>
+      <form style="text-align:center;">
+        <input type="checkbox" data-role="flipswitch" data-mini="true" id="displayTimer" checked="">
+        <label for="displayTimer" style="font-weight:bold;">Timer</label>
+      </form>
+      <div id="timer-1" class="timer-wrapper">
+        <span class="time-passed">0:00</span>
+      </div>
 
-      <section id="game-controls" class="group">
+      <form>
+        <input type="button" class="ui-btn ui-corner-all" data-enhanced="true" data-shadow="false" onclick="toggleTimer()" id="timer-stop" value="Pause" style="color:#38c; border:3px solid #38c;">
+      </form>
+
+      <form>
+        <fieldset data-role="controlgroup" data-type="horizontal" id="pallete" class="medium-toggle group">
+          <input type="radio" id="medium-option1" class="toggle-select toggle-select-left" name="medium" value="pen" checked>
+          <label for="medium-option1" style="color:#38c; border:3px solid #38c; border-right:none;">Stylo</label>
+          <input type="radio" id="medium-option2" class="toggle-select toggle-select-right" name="medium" value="pencil">
+          <label for="medium-option2" style="color:#38c; border:3px solid #38c; border-left:none;">Crayon</label>
+        </fieldset>
+      </form>
+
+      <div id="hint" class="hint">
+        <button>Show hint</button> 
+      </div>
+
+      <div id="game-menu" class="ui-grid-a">
+        <div class="ui-block-a" style="padding-right:3px;"><input type="button" class="select-new-puzzle" value="Nouveau"></div>
+        <div class="ui-block-b" style="padding-left:3px;"><input type="button" class="game-settings" value="Options"></div>
+      </div>
+
+      <div class="game-menu-options">
         <form>
-          <fieldset data-role="controlgroup" data-type="horizontal" id="pallete" class="medium-toggle group">
-            <input type="radio" id="medium-option1" class="toggle-select toggle-select-left" name="medium" value="pen" checked>
-            <label for="medium-option1">Pen</label>
-            <input type="radio" id="medium-option2" class="toggle-select toggle-select-right" name="medium" value="pencil">
-            <label for="medium-option2">Pencil</label>
+          <fieldset data-role="controlgroup" data-type="horizontal" id="select-puzzle-options">
+            <input type="radio" id="dificulty-option1" class="toggle-select-list select-option" name="dificulty" value="facile" checked="">
+            <label for="dificulty-option1">Facile</label>
+            <input type="radio" id="dificulty-option2" class="toggle-select-list select-option" name="dificulty" value="normal">
+            <label for="dificulty-option2">Normal</label>
+            <input type="radio" id="dificulty-option3" class="toggle-select-list select-option" name="dificulty" value="difficile">
+            <label for="dificulty-option3">Difficile</label>
           </fieldset>
         </form>
 
-        <div id="hint" class="hint">
-          <button>Show hint</button> 
-        </div>
-
-        <form>
-          <label for="select-back" style="float:left; font-weight:bold; line-height:32px; margin:9px 10px 0px 0px;">Background</label>
-          <input type="checkbox" data-role="flipswitch" id="select-back">
+        <form id="game-settings-options" form style="text-align:center;">          
+          <input type="checkbox" id="show-possible-values-option" class="possible-values">
+          <label for="show-possible-values-option">Show Possible Values</label>
+          <input type="checkbox" id="show-clash-highlights-option" class="highlight-clashes">
+          <label for="show-clash-highlights-option">Highlight Clashes</label>
         </form>
+      </div>
 
-        <nav class="game-menu">
-          <ul class="group">
-            <li class="select-new-puzzle"></li>
-            <li class="game-settings"></li>
-          </ul>
-        </nav>
-
-        <div class="game-menu-options">
-          <form>
-            <fieldset data-role="controlgroup" data-type="horizontal" id="select-puzzle-options">
-              <input type="radio" id="dificulty-option1" class="toggle-select-list select-option" name="dificulty" value="easy" checked>
-              <label for="dificulty-option1">Easy</label>
-              <input type="radio" id="dificulty-option2" class="toggle-select-list select-option" name="dificulty" value="medium">
-              <label for="dificulty-option2">Medium</label>
-              <input type="radio" id="dificulty-option3" class="toggle-select-list select-option" name="dificulty" value="hard">
-              <label for="dificulty-option3">Hard</label>
-            </fieldset>
-          </form>
-
-          <div id="game-settings-options">
-            <p class="game-rules">Sudoku Rules</p>
-            <div class="board-display-options">
-              <p>Game Display Settings</p>
-              <div class="group">
-                <input type="checkbox" id="show-possible-values-option" class="possible-values">
-                <label for="show-possible-values-option">Show Possible Values</label>
-              </div>
-              <div class="group">
-                <input type="checkbox" id="show-clash-highlights-option" class="highlight-clashes">
-                <label for="show-clash-highlights-option">Highlight Clashes</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="game-rules" class="game-rules-modal" class="group">
-        <div class="rules-container">
-          <div class="close-rules-modal">
-          </div>
-          <table>
-            <tbody>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td>1</td><td>2</td><td>3</td>
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td>4</td><td>5</td><td>6</td>
-                </tr>
-                <tr>
-                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td>
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td>
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>2</td> 
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>4</td>
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>5</td>
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>7</td> 
-                </tr>
-                <tr>
-                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>8</td>
-                </tr>
-            </tbody>
-          </table>
-          <div class="rules-content">
-            <h1>Sudoku Rules!</h1>
-            <div class="rules-body">
-              <p>A Sudoku puzzle consists of a 9x9 grid composed of 9 inner grids called <b>regions</b>.
-                The puzzle starts out with some of the squares of the 9x9 grid filled in. The ojbective is 
-                to fill in the rest of the puzzle according to the following constraints: 
-              </p>
-              <ul>
-                <li>Each of the squares composing any of the rows must contain any number from 1 through 9. 
-                    Each row must not have repeat values.
-                </li>
-                <li>Each of the squares composing any of the columns must contain any number from 1 through 9.
-                    Each column must not have repeat values.
-                </li>
-                <li>Each of the squares composing any of the regions must contain any number from 1 through 9.
-                    Each region must not have repeat values.
-                </li>
-              </ul>
-              <p>That's it! <span class="play-game">Play a game.</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>  
     </div><!-- /panel -->
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false" style="border:none; border-bottom-right-radius:20px 20px; border-bottom-left-radius:20px 20px">
       <a href="#defaultpanel" class="ui-btn ui-alt-icon ui-nodisc-icon ui-corner-all ui-icon-carat-l ui-btn-icon-notext ui-b#tn-inline ui-btn-hover-a ui-btn-down-b">Default panel</a>
-      <h1>SUDOKU</h1>
+      <h1><div id="game-details"><span class="difficulty">FACILE</span></div></h1>
       <a href="#popupMenu" data-rel="popup" data-transition="slideup" data-position-to="window" class="ui-btn ui-alt-icon ui-nodisc-icon ui-corner-all ui-icon-gear ui-btn-icon-notext ui-btn-inline ui-btn-hover-a ui-btn-down-b">Gear</a>
     </div><!-- /header -->
 
-    <div data-role="content" class="group">
+    <div data-role="content">
 
       <div class="square-box">
         <div class="square-content">
+          <div id="pause-hider"></div><!-- /pause -->
           <table id="soduku-board">
             <tbody>
             <tr>
@@ -274,15 +200,14 @@
 
     <script>
       $(document).ready(function(){
-        $("#select-back").on("change",function(){
-          $("#timer-1").toggle();
+        $("#displayTimer").on("change",function(){
+          $("#timer-1").toggleClass("hidden", 5000);
         });
       });
     </script>
     <script src="timer.js"></script>
     <script src="sudoku.js"></script>
     <script src="app.js"></script>
-
-  </div>
+  </div><!-- /page -->
   </body>
 </html>
